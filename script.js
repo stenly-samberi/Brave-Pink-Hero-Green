@@ -12,26 +12,27 @@ uploadInput.addEventListener('change', (e) => {
     canvas.width = img.width;
     canvas.height = img.height;
 
-    // Draw original image
     ctx.drawImage(img, 0, 0);
 
-    // Get image data
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
 
-    // Apply duotone effect
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
       const g = data[i + 1];
       const b = data[i + 2];
 
-      // Convert to grayscale
       const gray = 0.3 * r + 0.59 * g + 0.11 * b;
+      const t = gray / 255;
 
-      // Apply green shadows and pink highlights
-      data[i]     = gray * 1.2; // Red (pink highlight)
-      data[i + 1] = gray * 0.6; // Green (shadow)
-      data[i + 2] = gray * 0.8; // Blue (soft tone)
+      // Warna lebih soft
+      const shadowColor = { r: 60, g: 180, b: 140 };   // Hijau lembut
+      const highlightColor = { r: 255, g: 160, b: 200 }; // Pink pastel
+
+      // Interpolasi lembut
+      data[i]     = shadowColor.r + t * (highlightColor.r - shadowColor.r);
+      data[i + 1] = shadowColor.g + t * (highlightColor.g - shadowColor.g);
+      data[i + 2] = shadowColor.b + t * (highlightColor.b - shadowColor.b);
     }
 
     ctx.putImageData(imageData, 0, 0);
@@ -42,7 +43,7 @@ uploadInput.addEventListener('change', (e) => {
 
 downloadBtn.addEventListener('click', () => {
   const link = document.createElement('a');
-  link.download = 'duotone-image.png';
+  link.download = 'duotone-soft.png';
   link.href = canvas.toDataURL();
   link.click();
 });
